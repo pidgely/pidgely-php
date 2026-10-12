@@ -24,7 +24,7 @@ final class Batch extends Service
     {
         $headers = isset($options['batch_validation']) ? ['x-batch-validation' => $options['batch_validation']] : [];
 
-        return new BatchResult($this->transport->request('POST', '/emails/batch', [], array_values($emails), $options, $headers));
+        return new BatchResult($this->transport->request('POST', '/emails/batch', [], $emails, $options, $headers));
     }
 
     /**
