@@ -38,12 +38,12 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     public function offsetExists(mixed $offset): bool
     {
-        return \is_string($offset) && \array_key_exists($offset, $this->attributes);
+        return \array_key_exists($offset, $this->attributes);
     }
 
     public function offsetGet(mixed $offset): mixed
     {
-        return \is_string($offset) ? ($this->attributes[$offset] ?? null) : null;
+        return $this->attributes[$offset] ?? null;
     }
 
     public function offsetSet(mixed $offset, mixed $value): never

@@ -39,6 +39,11 @@ final class MockHttpClient implements ClientInterface
         return $next;
     }
 
+    public function count(): int
+    {
+        return \count($this->requests);
+    }
+
     public function last(): RequestInterface
     {
         $last = end($this->requests);

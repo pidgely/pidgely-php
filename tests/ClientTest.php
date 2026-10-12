@@ -172,7 +172,7 @@ final class ClientTest extends TestCase
     {
         $client = $this->client([self::unavailable(), self::unavailable(), self::json(200, ['id' => 'e1'])]);
         self::assertSame('e1', $client->emails->get('e1')->id);
-        self::assertCount(3, $this->http->requests);
+        self::assertSame(3, $this->http->count());
         self::assertCount(2, $this->sleeps);
         self::assertGreaterThanOrEqual(0.25, $this->sleeps[0]);
         self::assertLessThanOrEqual(0.5, $this->sleeps[0]);
@@ -188,7 +188,7 @@ final class ClientTest extends TestCase
             self::fail('Expected an exception');
         } catch (InternalServerException) {
         }
-        self::assertCount(3, $this->http->requests);
+        self::assertSame(3, $this->http->count());
     }
 
     public function testRetryOptions(): void
@@ -198,12 +198,12 @@ final class ClientTest extends TestCase
             $client->domains->list();
         } catch (InternalServerException) {
         }
-        self::assertCount(1, $this->http->requests);
+        self::assertSame(1, $this->http->count());
         try {
             $client->domains->list([], ['max_retries' => 4]);
         } catch (InternalServerException) {
         }
-        self::assertCount(6, $this->http->requests);
+        self::assertSame(6, $this->http->count());
     }
 
     /**
@@ -226,7 +226,7 @@ final class ClientTest extends TestCase
             self::fail('Expected an exception');
         } catch (PidgelyException) {
         }
-        self::assertCount(1, $this->http->requests);
+        self::assertSame(1, $this->http->count());
         self::assertSame([], $this->sleeps);
     }
 
@@ -234,7 +234,7 @@ final class ClientTest extends TestCase
     {
         $client = $this->client([self::unavailable(), self::rateLimited(), new NetworkException('x'), self::json(200, ['id' => 'e1'])], ['max_retries' => 3]);
         self::assertSame('e1', $client->emails->send(['to' => 'a@b.c'], ['idempotency_key' => 'k1'])->id);
-        self::assertCount(4, $this->http->requests);
+        self::assertSame(4, $this->http->count());
         foreach ($this->http->requests as $request) {
             self::assertSame('k1', $request->getHeaderLine('Idempotency-Key'));
             self::assertSame('{"to":"a@b.c"}', (string) $request->getBody());
@@ -246,7 +246,7 @@ final class ClientTest extends TestCase
         $client = $this->client([self::unavailable(), self::json(200, []), self::unavailable(), self::json(200, [])]);
         $client->domains->update(['id' => 'd', 'tls' => 'enforced']);
         $client->domains->remove('d');
-        self::assertCount(4, $this->http->requests);
+        self::assertSame(4, $this->http->count());
     }
 
     public function testHonoursRetryAfter(): void
@@ -265,7 +265,7 @@ final class ClientTest extends TestCase
         } catch (RateLimitException $e) {
             self::assertSame('120', $e->getHeaders()['retry-after']);
         }
-        self::assertCount(1, $this->http->requests);
+        self::assertSame(1, $this->http->count());
     }
 
     public function testQuotaErrorsNotRetried(): void
@@ -275,7 +275,7 @@ final class ClientTest extends TestCase
             $client->domains->list();
         } catch (RateLimitException) {
         }
-        self::assertCount(1, $this->http->requests);
+        self::assertSame(1, $this->http->count());
     }
 
     public function testNonRetryableStatus(): void
@@ -285,7 +285,7 @@ final class ClientTest extends TestCase
             $client->domains->list();
         } catch (ValidationException) {
         }
-        self::assertCount(1, $this->http->requests);
+        self::assertSame(1, $this->http->count());
     }
 
     public function testRetriesGetOnNetworkError(): void
@@ -298,7 +298,7 @@ final class ClientTest extends TestCase
             self::assertSame('Unable to reach the Pidgely API: down', $e->getMessage());
             self::assertNull($e->getStatusCode());
         }
-        self::assertCount(3, $this->http->requests);
+        self::assertSame(3, $this->http->count());
         self::assertCount(2, $this->sleeps);
     }
 

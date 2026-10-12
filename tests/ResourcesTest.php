@@ -7,8 +7,6 @@ namespace Pidgely\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Pidgely\Client;
 use Pidgely\Exception\PidgelyException;
-use Pidgely\Model\Collection;
-use Pidgely\Model\Domain;
 use Pidgely\Model\Email;
 
 final class ResourcesTest extends TestCase
@@ -171,7 +169,6 @@ final class ResourcesTest extends TestCase
             self::json(200, ['object' => 'contact', 'id' => 'c', 'email' => 'a@b.c', 'unsubscribed' => false, 'properties' => ['plan' => ['value' => 'pro', 'type' => 'string']]]),
         ]);
         $email = $client->emails->get('e1');
-        self::assertInstanceOf(Email::class, $email);
         self::assertSame(['a@b.c'], $email->to);
         self::assertNull($email->html);
         self::assertSame('delivered', $email->lastEvent);
@@ -182,11 +179,9 @@ final class ResourcesTest extends TestCase
         self::assertSame('{"object":"email"', substr((string) json_encode($email), 0, 17));
 
         $domains = $client->domains->list();
-        self::assertInstanceOf(Collection::class, $domains);
         self::assertTrue($domains->hasMore);
         self::assertCount(1, $domains);
         foreach ($domains as $domain) {
-            self::assertInstanceOf(Domain::class, $domain);
             self::assertSame(10, $domain->records[0]->priority);
             self::assertSame('enabled', $domain->capabilities['sending']);
         }

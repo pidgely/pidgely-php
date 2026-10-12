@@ -17,7 +17,8 @@ final class Batch extends Service
     /**
      * POST /emails/batch. Options also take batch_validation (strict or permissive).
      *
-     * @param RequestOptions       $options
+     * @param list<array<string, mixed>> $emails
+     * @param RequestOptions             $options
      */
     public function send(array $emails, array $options = []): BatchResult
     {
