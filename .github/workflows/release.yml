@@ -1,0 +1,50 @@
+name: Release
+
+# Packagist publishes tags automatically through the GitHub webhook (or the Packagist
+# GitHub app) configured when the package was submitted at https://packagist.org.
+# This workflow runs on `v*` tags: it checks that the tag matches Client::VERSION, runs
+# the tests and creates the GitHub release. If the repository secrets PACKAGIST_USERNAME
+# and PACKAGIST_TOKEN are set, it also asks Packagist to update right away.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write # create the GitHub release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      PACKAGIST_USERNAME: ${{ secrets.PACKAGIST_USERNAME }}
+      PACKAGIST_TOKEN: ${{ secrets.PACKAGIST_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - name: Check tag matches Client::VERSION
+        run: |
+          version="$(sed -n "s/.*public const VERSION = '\(.*\)';/\1/p" src/Client.php)"
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match Client::VERSION $version"
+            exit 1
+          fi
+      - run: composer validate --strict
+      - run: composer update --no-interaction --no-progress --prefer-dist
+      - run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+      - run: vendor/bin/phpunit
+      - name: Notify Packagist
+        if: ${{ env.PACKAGIST_TOKEN != '' }}
+        run: |
+          curl -fsS -X POST -H 'Content-Type: application/json' \
+            "https://packagist.org/api/update-package?username=${PACKAGIST_USERNAME}&apiToken=${PACKAGIST_TOKEN}" \
+            -d '{"repository":{"url":"https://github.com/pidgely/pidgely-php"}}'
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes="$(awk -v v="${GITHUB_REF_NAME#v}" '$0 ~ "^## \\[?"v {f=1; next} /^## / && f {exit} f' CHANGELOG.md)"
+          gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes "${notes:-See CHANGELOG.md}"

@@ -1,0 +1,65 @@
+{
+    "name": "pidgely/pidgely-php",
+    "description": "Official PHP SDK for the Pidgely email API (Resend-compatible).",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["pidgely", "email", "email-api", "transactional-email", "resend", "sdk", "smtp", "webhooks", "psr-18"],
+    "homepage": "https://docs.pidgely.com",
+    "support": {
+        "issues": "https://github.com/pidgely/pidgely-php/issues",
+        "source": "https://github.com/pidgely/pidgely-php",
+        "docs": "https://docs.pidgely.com"
+    },
+    "authors": [
+        {
+            "name": "Caotec Serviços em Tecnologia Ltda",
+            "email": "dev@fexxo.com.br"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "php-http/discovery": "^1.19",
+        "psr/http-client": "^1.0",
+        "psr/http-client-implementation": "*",
+        "psr/http-factory": "^1.0",
+        "psr/http-factory-implementation": "*",
+        "psr/http-message": "^1.1 || ^2.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.64",
+        "guzzlehttp/guzzle": "^7.8",
+        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpunit/phpunit": "^10.5 || ^11.0"
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "The default PSR-18 HTTP client (also enables per-request timeouts)."
+    },
+    "autoload": {
+        "psr-4": {
+            "Pidgely\\": "src/"
+        },
+        "files": [
+            "src/Pidgely.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Pidgely\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse --memory-limit=1G",
+        "cs": "php-cs-fixer fix --dry-run --diff",
+        "cs:fix": "php-cs-fixer fix"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
