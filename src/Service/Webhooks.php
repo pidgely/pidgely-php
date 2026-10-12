@@ -11,7 +11,7 @@ use Pidgely\Model\ResourceId;
 use Pidgely\Model\Webhook;
 use Pidgely\Model\WebhookEvent;
 use Pidgely\Model\WebhookSecret;
-use Pidgely\Webhook;
+use Pidgely\Webhook as WebhookVerifier;
 use Psr\Http\Message\MessageInterface;
 
 /**
@@ -91,8 +91,8 @@ final class Webhooks extends Service
      *
      * @param MessageInterface|array<string, string|list<string>> $headers
      */
-    public function verify(string $payload, MessageInterface|array $headers, #[\SensitiveParameter] string $secret, int $tolerance = Webhook::DEFAULT_TOLERANCE): WebhookEvent
+    public function verify(string $payload, MessageInterface|array $headers, #[\SensitiveParameter] string $secret, int $tolerance = WebhookVerifier::DEFAULT_TOLERANCE): WebhookEvent
     {
-        return Webhook::verify($payload, $headers, $secret, $tolerance);
+        return WebhookVerifier::verify($payload, $headers, $secret, $tolerance);
     }
 }
