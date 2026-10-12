@@ -7,6 +7,4 @@ namespace Pidgely\Exception;
 /**
  * A webhook delivery could not be verified.
  */
-class WebhookVerificationException extends \RuntimeException
-{
-}
+class WebhookVerificationException extends \RuntimeException {}

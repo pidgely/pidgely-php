@@ -62,7 +62,7 @@ final class Transport
         private readonly RequestFactoryInterface $requestFactory,
         private readonly StreamFactoryInterface $streamFactory,
     ) {
-        $this->credentials = static fn (): string => $apiKey;
+        $this->credentials = static fn(): string => $apiKey;
         $this->sleep = static function (float $seconds): void {
             usleep((int) round($seconds * 1_000_000));
         };

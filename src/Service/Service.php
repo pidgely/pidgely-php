@@ -16,9 +16,7 @@ use Pidgely\Model\Model;
  */
 abstract class Service
 {
-    public function __construct(protected readonly Transport $transport)
-    {
-    }
+    public function __construct(protected readonly Transport $transport) {}
 
     /**
      * @return array<string, mixed>
@@ -39,7 +37,7 @@ abstract class Service
                 return (string) $value;
             }
         }
-        $names = implode(' or ', array_map(static fn (string $k): string => '`'.$k.'`', $keys));
+        $names = implode(' or ', array_map(static fn(string $k): string => '`'.$k.'`', $keys));
 
         throw new PidgelyException('Missing '.$names.' field.', 'missing_required_field');
     }

@@ -9,6 +9,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Pidgely\Client;
 use Pidgely\Exception\ApiConnectionException;
 use Pidgely\Exception\ApiTimeoutException;
@@ -22,7 +23,6 @@ use Pidgely\Exception\PidgelyException;
 use Pidgely\Exception\RateLimitException;
 use Pidgely\Exception\ValidationException;
 use Pidgely\Internal\Transport;
-use PHPUnit\Framework\Attributes\DataProvider;
 
 final class ClientTest extends TestCase
 {
@@ -72,15 +72,16 @@ final class ClientTest extends TestCase
 
     public function testApiKeyNeverLeaks(): void
     {
+        $idle = $this->client([], ['max_retries' => 0]);
+        $outputs = [print_r($idle, true), var_export($idle, true), (string) json_encode($idle), print_r($idle->emails, true)];
+        ob_start();
+        var_dump($idle);
+        var_dump($idle->transport());
+        $outputs[] = (string) ob_get_clean();
         $client = $this->client([
             self::json(401, ['statusCode' => 401, 'name' => 'invalid_api_key', 'message' => 'API key is invalid']),
             new NetworkException('connection reset while talking with '.self::API_KEY),
         ], ['max_retries' => 0]);
-        $outputs = [print_r($client, true), var_export($client, true), (string) json_encode($client), print_r($client->emails, true)];
-        ob_start();
-        var_dump($client);
-        var_dump($client->transport());
-        $outputs[] = (string) ob_get_clean();
         try {
             $client->emails->get('e1');
         } catch (AuthenticationException $e) {

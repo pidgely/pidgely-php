@@ -27,6 +27,7 @@ jobs:
       - name: php-cs-fixer
         run: vendor/bin/php-cs-fixer fix --dry-run --diff
       - name: PHPStan (level max)
+        if: ${{ !cancelled() }}
         run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 
   test:

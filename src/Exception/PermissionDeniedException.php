@@ -7,6 +7,4 @@ namespace Pidgely\Exception;
 /**
  * 403: restricted key, unverified domain or plan limit.
  */
-class PermissionDeniedException extends PidgelyException
-{
-}
+class PermissionDeniedException extends PidgelyException {}

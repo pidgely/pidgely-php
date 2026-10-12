@@ -7,6 +7,4 @@ namespace Pidgely\Exception;
 /**
  * 401: missing or invalid API key.
  */
-class AuthenticationException extends PidgelyException
-{
-}
+class AuthenticationException extends PidgelyException {}

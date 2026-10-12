@@ -7,6 +7,4 @@ namespace Pidgely\Exception;
 /**
  * An attempt exceeded the timeout.
  */
-class ApiTimeoutException extends ApiConnectionException
-{
-}
+class ApiTimeoutException extends ApiConnectionException {}

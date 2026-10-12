@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Pidgely\Tests;
 
 use GuzzleHttp\Psr7\ServerRequest;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Pidgely\Client;
 use Pidgely\Exception\WebhookVerificationException;
 use Pidgely\Webhook;
-use PHPUnit\Framework\Attributes\DataProvider;
 
 final class WebhookTest extends TestCase
 {

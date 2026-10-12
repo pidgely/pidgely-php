@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Pidgely\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Pidgely\Client;
 use Pidgely\Exception\PidgelyException;
 use Pidgely\Model\Collection;
 use Pidgely\Model\Domain;
 use Pidgely\Model\Email;
-use PHPUnit\Framework\Attributes\DataProvider;
 
 final class ResourcesTest extends TestCase
 {
@@ -19,79 +19,79 @@ final class ResourcesTest extends TestCase
     public static function endpoints(): iterable
     {
         // Emails
-        yield 'emails.get' => [fn (Client $c) => $c->emails->get('e 1'), 'GET', '/emails/e%201', [], null];
-        yield 'emails.list' => [fn (Client $c) => $c->emails->list(['limit' => 10, 'after' => 'cur']), 'GET', '/emails', ['limit' => '10', 'after' => 'cur'], null];
-        yield 'emails.update' => [fn (Client $c) => $c->emails->update(['id' => 'e1', 'scheduled_at' => 'in 2 hours']), 'PATCH', '/emails/e1', [], ['scheduled_at' => 'in 2 hours']];
-        yield 'emails.cancel' => [fn (Client $c) => $c->emails->cancel('e1'), 'POST', '/emails/e1/cancel', [], null];
-        yield 'emails.attachments.list' => [fn (Client $c) => $c->emails->attachments->list(['email_id' => 'e1']), 'GET', '/emails/e1/attachments', [], null];
-        yield 'emails.attachments.get' => [fn (Client $c) => $c->emails->attachments->get(['email_id' => 'e1', 'id' => 'a1']), 'GET', '/emails/e1/attachments/a1', [], null];
-        yield 'batch.create' => [fn (Client $c) => $c->batch->create([['to' => 'a@b.c']]), 'POST', '/emails/batch', [], [['to' => 'a@b.c']]];
+        yield 'emails.get' => [fn(Client $c) => $c->emails->get('e 1'), 'GET', '/emails/e%201', [], null];
+        yield 'emails.list' => [fn(Client $c) => $c->emails->list(['limit' => 10, 'after' => 'cur']), 'GET', '/emails', ['limit' => '10', 'after' => 'cur'], null];
+        yield 'emails.update' => [fn(Client $c) => $c->emails->update(['id' => 'e1', 'scheduled_at' => 'in 2 hours']), 'PATCH', '/emails/e1', [], ['scheduled_at' => 'in 2 hours']];
+        yield 'emails.cancel' => [fn(Client $c) => $c->emails->cancel('e1'), 'POST', '/emails/e1/cancel', [], null];
+        yield 'emails.attachments.list' => [fn(Client $c) => $c->emails->attachments->list(['email_id' => 'e1']), 'GET', '/emails/e1/attachments', [], null];
+        yield 'emails.attachments.get' => [fn(Client $c) => $c->emails->attachments->get(['email_id' => 'e1', 'id' => 'a1']), 'GET', '/emails/e1/attachments/a1', [], null];
+        yield 'batch.create' => [fn(Client $c) => $c->batch->create([['to' => 'a@b.c']]), 'POST', '/emails/batch', [], [['to' => 'a@b.c']]];
         // Domains
-        yield 'domains.create' => [fn (Client $c) => $c->domains->create(['name' => 'acme.com', 'tls' => 'opportunistic']), 'POST', '/domains', [], ['name' => 'acme.com', 'tls' => 'opportunistic']];
-        yield 'domains.get' => [fn (Client $c) => $c->domains->get('d1'), 'GET', '/domains/d1', [], null];
-        yield 'domains.list' => [fn (Client $c) => $c->domains->list(['before' => 'x']), 'GET', '/domains', ['before' => 'x'], null];
-        yield 'domains.update' => [fn (Client $c) => $c->domains->update(['id' => 'd1', 'tls' => 'enforced']), 'PATCH', '/domains/d1', [], ['tls' => 'enforced']];
-        yield 'domains.remove' => [fn (Client $c) => $c->domains->remove('d1'), 'DELETE', '/domains/d1', [], null];
-        yield 'domains.verify' => [fn (Client $c) => $c->domains->verify('d1'), 'POST', '/domains/d1/verify', [], null];
+        yield 'domains.create' => [fn(Client $c) => $c->domains->create(['name' => 'acme.com', 'tls' => 'opportunistic']), 'POST', '/domains', [], ['name' => 'acme.com', 'tls' => 'opportunistic']];
+        yield 'domains.get' => [fn(Client $c) => $c->domains->get('d1'), 'GET', '/domains/d1', [], null];
+        yield 'domains.list' => [fn(Client $c) => $c->domains->list(['before' => 'x']), 'GET', '/domains', ['before' => 'x'], null];
+        yield 'domains.update' => [fn(Client $c) => $c->domains->update(['id' => 'd1', 'tls' => 'enforced']), 'PATCH', '/domains/d1', [], ['tls' => 'enforced']];
+        yield 'domains.remove' => [fn(Client $c) => $c->domains->remove('d1'), 'DELETE', '/domains/d1', [], null];
+        yield 'domains.verify' => [fn(Client $c) => $c->domains->verify('d1'), 'POST', '/domains/d1/verify', [], null];
         // API keys
-        yield 'apiKeys.create' => [fn (Client $c) => $c->apiKeys->create(['name' => 'Prod', 'permission' => 'sending_access', 'domain_id' => 'd1']), 'POST', '/api-keys', [], ['name' => 'Prod', 'permission' => 'sending_access', 'domain_id' => 'd1']];
-        yield 'apiKeys.list' => [fn (Client $c) => $c->apiKeys->list(), 'GET', '/api-keys', [], null];
-        yield 'apiKeys.update' => [fn (Client $c) => $c->apiKeys->update('k1', ['name' => 'New']), 'PATCH', '/api-keys/k1', [], ['name' => 'New']];
-        yield 'apiKeys.remove' => [fn (Client $c) => $c->apiKeys->remove('k1'), 'DELETE', '/api-keys/k1', [], null];
+        yield 'apiKeys.create' => [fn(Client $c) => $c->apiKeys->create(['name' => 'Prod', 'permission' => 'sending_access', 'domain_id' => 'd1']), 'POST', '/api-keys', [], ['name' => 'Prod', 'permission' => 'sending_access', 'domain_id' => 'd1']];
+        yield 'apiKeys.list' => [fn(Client $c) => $c->apiKeys->list(), 'GET', '/api-keys', [], null];
+        yield 'apiKeys.update' => [fn(Client $c) => $c->apiKeys->update('k1', ['name' => 'New']), 'PATCH', '/api-keys/k1', [], ['name' => 'New']];
+        yield 'apiKeys.remove' => [fn(Client $c) => $c->apiKeys->remove('k1'), 'DELETE', '/api-keys/k1', [], null];
         // Contacts
-        yield 'contacts.create' => [fn (Client $c) => $c->contacts->create(['email' => 'ana@x.y', 'first_name' => 'Ana', 'segments' => [['id' => 's1']]]), 'POST', '/contacts', [], ['email' => 'ana@x.y', 'first_name' => 'Ana', 'segments' => [['id' => 's1']]]];
-        yield 'contacts.create audience' => [fn (Client $c) => $c->contacts->create(['email' => 'ana@x.y', 'audience_id' => 'aud1']), 'POST', '/audiences/aud1/contacts', [], ['email' => 'ana@x.y']];
-        yield 'contacts.list' => [fn (Client $c) => $c->contacts->list(['segment_id' => 's1', 'limit' => 100]), 'GET', '/contacts', ['limit' => '100', 'segment_id' => 's1'], null];
-        yield 'contacts.list audience' => [fn (Client $c) => $c->contacts->list(['audience_id' => 'a1']), 'GET', '/contacts', ['audience_id' => 'a1'], null];
-        yield 'contacts.get string' => [fn (Client $c) => $c->contacts->get('ana+x@x.y'), 'GET', '/contacts/ana+x@x.y', [], null];
-        yield 'contacts.get email' => [fn (Client $c) => $c->contacts->get(['email' => 'ana@x.y']), 'GET', '/contacts/ana@x.y', [], null];
-        yield 'contacts.get audience' => [fn (Client $c) => $c->contacts->get(['email' => 'ana@x.y', 'audience_id' => 'a1']), 'GET', '/audiences/a1/contacts/ana@x.y', [], null];
-        yield 'contacts.update' => [fn (Client $c) => $c->contacts->update(['email' => 'ana@x.y', 'unsubscribed' => true]), 'PATCH', '/contacts/ana@x.y', [], ['unsubscribed' => true]];
-        yield 'contacts.remove' => [fn (Client $c) => $c->contacts->remove(['id' => 'c1']), 'DELETE', '/contacts/c1', [], null];
-        yield 'contacts.segments.list' => [fn (Client $c) => $c->contacts->segments->list(['email' => 'ana@x.y']), 'GET', '/contacts/ana@x.y/segments', [], null];
-        yield 'contacts.segments.add' => [fn (Client $c) => $c->contacts->segments->add(['email' => 'ana@x.y', 'segment_id' => 's1']), 'POST', '/contacts/ana@x.y/segments/s1', [], null];
-        yield 'contacts.segments.remove' => [fn (Client $c) => $c->contacts->segments->remove(['contact_id' => 'c1', 'segment_id' => 's1']), 'DELETE', '/contacts/c1/segments/s1', [], null];
+        yield 'contacts.create' => [fn(Client $c) => $c->contacts->create(['email' => 'ana@x.y', 'first_name' => 'Ana', 'segments' => [['id' => 's1']]]), 'POST', '/contacts', [], ['email' => 'ana@x.y', 'first_name' => 'Ana', 'segments' => [['id' => 's1']]]];
+        yield 'contacts.create audience' => [fn(Client $c) => $c->contacts->create(['email' => 'ana@x.y', 'audience_id' => 'aud1']), 'POST', '/audiences/aud1/contacts', [], ['email' => 'ana@x.y']];
+        yield 'contacts.list' => [fn(Client $c) => $c->contacts->list(['segment_id' => 's1', 'limit' => 100]), 'GET', '/contacts', ['limit' => '100', 'segment_id' => 's1'], null];
+        yield 'contacts.list audience' => [fn(Client $c) => $c->contacts->list(['audience_id' => 'a1']), 'GET', '/contacts', ['audience_id' => 'a1'], null];
+        yield 'contacts.get string' => [fn(Client $c) => $c->contacts->get('ana+x@x.y'), 'GET', '/contacts/ana+x@x.y', [], null];
+        yield 'contacts.get email' => [fn(Client $c) => $c->contacts->get(['email' => 'ana@x.y']), 'GET', '/contacts/ana@x.y', [], null];
+        yield 'contacts.get audience' => [fn(Client $c) => $c->contacts->get(['email' => 'ana@x.y', 'audience_id' => 'a1']), 'GET', '/audiences/a1/contacts/ana@x.y', [], null];
+        yield 'contacts.update' => [fn(Client $c) => $c->contacts->update(['email' => 'ana@x.y', 'unsubscribed' => true]), 'PATCH', '/contacts/ana@x.y', [], ['unsubscribed' => true]];
+        yield 'contacts.remove' => [fn(Client $c) => $c->contacts->remove(['id' => 'c1']), 'DELETE', '/contacts/c1', [], null];
+        yield 'contacts.segments.list' => [fn(Client $c) => $c->contacts->segments->list(['email' => 'ana@x.y']), 'GET', '/contacts/ana@x.y/segments', [], null];
+        yield 'contacts.segments.add' => [fn(Client $c) => $c->contacts->segments->add(['email' => 'ana@x.y', 'segment_id' => 's1']), 'POST', '/contacts/ana@x.y/segments/s1', [], null];
+        yield 'contacts.segments.remove' => [fn(Client $c) => $c->contacts->segments->remove(['contact_id' => 'c1', 'segment_id' => 's1']), 'DELETE', '/contacts/c1/segments/s1', [], null];
         // Segments
-        yield 'segments.create' => [fn (Client $c) => $c->segments->create(['name' => 'Pro']), 'POST', '/segments', [], ['name' => 'Pro']];
-        yield 'segments.list' => [fn (Client $c) => $c->segments->list(), 'GET', '/segments', [], null];
-        yield 'segments.get' => [fn (Client $c) => $c->segments->get('s1'), 'GET', '/segments/s1', [], null];
-        yield 'segments.update' => [fn (Client $c) => $c->segments->update('s1', ['name' => 'Team']), 'PATCH', '/segments/s1', [], ['name' => 'Team']];
-        yield 'segments.remove' => [fn (Client $c) => $c->segments->remove('s1'), 'DELETE', '/segments/s1', [], null];
-        yield 'segments.listContacts' => [fn (Client $c) => $c->segments->listContacts('s1', ['limit' => 50]), 'GET', '/segments/s1/contacts', ['limit' => '50'], null];
-        yield 'audiences alias' => [fn (Client $c) => $c->audiences->get('s1'), 'GET', '/segments/s1', [], null];
+        yield 'segments.create' => [fn(Client $c) => $c->segments->create(['name' => 'Pro']), 'POST', '/segments', [], ['name' => 'Pro']];
+        yield 'segments.list' => [fn(Client $c) => $c->segments->list(), 'GET', '/segments', [], null];
+        yield 'segments.get' => [fn(Client $c) => $c->segments->get('s1'), 'GET', '/segments/s1', [], null];
+        yield 'segments.update' => [fn(Client $c) => $c->segments->update('s1', ['name' => 'Team']), 'PATCH', '/segments/s1', [], ['name' => 'Team']];
+        yield 'segments.remove' => [fn(Client $c) => $c->segments->remove('s1'), 'DELETE', '/segments/s1', [], null];
+        yield 'segments.listContacts' => [fn(Client $c) => $c->segments->listContacts('s1', ['limit' => 50]), 'GET', '/segments/s1/contacts', ['limit' => '50'], null];
+        yield 'audiences alias' => [fn(Client $c) => $c->audiences->get('s1'), 'GET', '/segments/s1', [], null];
         // Broadcasts
-        yield 'broadcasts.create' => [fn (Client $c) => $c->broadcasts->create(['segment_id' => 's1', 'from' => 'n@acme.com', 'subject' => 'News', 'html' => '<p>Hi</p>', 'send' => true]), 'POST', '/broadcasts', [], ['segment_id' => 's1', 'from' => 'n@acme.com', 'subject' => 'News', 'html' => '<p>Hi</p>', 'send' => true]];
-        yield 'broadcasts.list' => [fn (Client $c) => $c->broadcasts->list(), 'GET', '/broadcasts', [], null];
-        yield 'broadcasts.get' => [fn (Client $c) => $c->broadcasts->get('b1'), 'GET', '/broadcasts/b1', [], null];
-        yield 'broadcasts.update' => [fn (Client $c) => $c->broadcasts->update('b1', ['subject' => 'New']), 'PATCH', '/broadcasts/b1', [], ['subject' => 'New']];
-        yield 'broadcasts.remove' => [fn (Client $c) => $c->broadcasts->remove('b1'), 'DELETE', '/broadcasts/b1', [], null];
-        yield 'broadcasts.send now' => [fn (Client $c) => $c->broadcasts->send('b1'), 'POST', '/broadcasts/b1/send', [], '{}'];
-        yield 'broadcasts.send later' => [fn (Client $c) => $c->broadcasts->send('b1', ['scheduled_at' => 'in 1 hour']), 'POST', '/broadcasts/b1/send', [], ['scheduled_at' => 'in 1 hour']];
-        yield 'broadcasts.cancel' => [fn (Client $c) => $c->broadcasts->cancel('b1'), 'POST', '/broadcasts/b1/cancel', [], null];
-        yield 'broadcasts.duplicate' => [fn (Client $c) => $c->broadcasts->duplicate('b1'), 'POST', '/broadcasts/b1/duplicate', [], null];
+        yield 'broadcasts.create' => [fn(Client $c) => $c->broadcasts->create(['segment_id' => 's1', 'from' => 'n@acme.com', 'subject' => 'News', 'html' => '<p>Hi</p>', 'send' => true]), 'POST', '/broadcasts', [], ['segment_id' => 's1', 'from' => 'n@acme.com', 'subject' => 'News', 'html' => '<p>Hi</p>', 'send' => true]];
+        yield 'broadcasts.list' => [fn(Client $c) => $c->broadcasts->list(), 'GET', '/broadcasts', [], null];
+        yield 'broadcasts.get' => [fn(Client $c) => $c->broadcasts->get('b1'), 'GET', '/broadcasts/b1', [], null];
+        yield 'broadcasts.update' => [fn(Client $c) => $c->broadcasts->update('b1', ['subject' => 'New']), 'PATCH', '/broadcasts/b1', [], ['subject' => 'New']];
+        yield 'broadcasts.remove' => [fn(Client $c) => $c->broadcasts->remove('b1'), 'DELETE', '/broadcasts/b1', [], null];
+        yield 'broadcasts.send now' => [fn(Client $c) => $c->broadcasts->send('b1'), 'POST', '/broadcasts/b1/send', [], '{}'];
+        yield 'broadcasts.send later' => [fn(Client $c) => $c->broadcasts->send('b1', ['scheduled_at' => 'in 1 hour']), 'POST', '/broadcasts/b1/send', [], ['scheduled_at' => 'in 1 hour']];
+        yield 'broadcasts.cancel' => [fn(Client $c) => $c->broadcasts->cancel('b1'), 'POST', '/broadcasts/b1/cancel', [], null];
+        yield 'broadcasts.duplicate' => [fn(Client $c) => $c->broadcasts->duplicate('b1'), 'POST', '/broadcasts/b1/duplicate', [], null];
         // Templates
-        yield 'templates.create' => [fn (Client $c) => $c->templates->create(['name' => 'Welcome', 'variables' => [['key' => 'N', 'type' => 'number', 'fallback_value' => 14]]]), 'POST', '/templates', [], ['name' => 'Welcome', 'variables' => [['key' => 'N', 'type' => 'number', 'fallback_value' => 14]]]];
-        yield 'templates.list' => [fn (Client $c) => $c->templates->list(), 'GET', '/templates', [], null];
-        yield 'templates.get' => [fn (Client $c) => $c->templates->get('welcome'), 'GET', '/templates/welcome', [], null];
-        yield 'templates.update' => [fn (Client $c) => $c->templates->update('welcome', ['subject' => 'New']), 'PATCH', '/templates/welcome', [], ['subject' => 'New']];
-        yield 'templates.remove' => [fn (Client $c) => $c->templates->remove('welcome'), 'DELETE', '/templates/welcome', [], null];
-        yield 'templates.publish' => [fn (Client $c) => $c->templates->publish('welcome'), 'POST', '/templates/welcome/publish', [], null];
-        yield 'templates.duplicate' => [fn (Client $c) => $c->templates->duplicate('welcome'), 'POST', '/templates/welcome/duplicate', [], null];
+        yield 'templates.create' => [fn(Client $c) => $c->templates->create(['name' => 'Welcome', 'variables' => [['key' => 'N', 'type' => 'number', 'fallback_value' => 14]]]), 'POST', '/templates', [], ['name' => 'Welcome', 'variables' => [['key' => 'N', 'type' => 'number', 'fallback_value' => 14]]]];
+        yield 'templates.list' => [fn(Client $c) => $c->templates->list(), 'GET', '/templates', [], null];
+        yield 'templates.get' => [fn(Client $c) => $c->templates->get('welcome'), 'GET', '/templates/welcome', [], null];
+        yield 'templates.update' => [fn(Client $c) => $c->templates->update('welcome', ['subject' => 'New']), 'PATCH', '/templates/welcome', [], ['subject' => 'New']];
+        yield 'templates.remove' => [fn(Client $c) => $c->templates->remove('welcome'), 'DELETE', '/templates/welcome', [], null];
+        yield 'templates.publish' => [fn(Client $c) => $c->templates->publish('welcome'), 'POST', '/templates/welcome/publish', [], null];
+        yield 'templates.duplicate' => [fn(Client $c) => $c->templates->duplicate('welcome'), 'POST', '/templates/welcome/duplicate', [], null];
         // Webhooks
-        yield 'webhooks.create' => [fn (Client $c) => $c->webhooks->create(['endpoint' => 'https://acme.com/wh', 'events' => ['email.delivered']]), 'POST', '/webhooks', [], ['endpoint' => 'https://acme.com/wh', 'events' => ['email.delivered']]];
-        yield 'webhooks.list' => [fn (Client $c) => $c->webhooks->list(), 'GET', '/webhooks', [], null];
-        yield 'webhooks.get' => [fn (Client $c) => $c->webhooks->get('w1'), 'GET', '/webhooks/w1', [], null];
-        yield 'webhooks.update' => [fn (Client $c) => $c->webhooks->update('w1', ['status' => 'disabled']), 'PATCH', '/webhooks/w1', [], ['status' => 'disabled']];
-        yield 'webhooks.remove' => [fn (Client $c) => $c->webhooks->remove('w1'), 'DELETE', '/webhooks/w1', [], null];
-        yield 'webhooks.rotate' => [fn (Client $c) => $c->webhooks->rotateSigningSecret('w1'), 'POST', '/webhooks/w1/signing-secret/rotate', [], null];
+        yield 'webhooks.create' => [fn(Client $c) => $c->webhooks->create(['endpoint' => 'https://acme.com/wh', 'events' => ['email.delivered']]), 'POST', '/webhooks', [], ['endpoint' => 'https://acme.com/wh', 'events' => ['email.delivered']]];
+        yield 'webhooks.list' => [fn(Client $c) => $c->webhooks->list(), 'GET', '/webhooks', [], null];
+        yield 'webhooks.get' => [fn(Client $c) => $c->webhooks->get('w1'), 'GET', '/webhooks/w1', [], null];
+        yield 'webhooks.update' => [fn(Client $c) => $c->webhooks->update('w1', ['status' => 'disabled']), 'PATCH', '/webhooks/w1', [], ['status' => 'disabled']];
+        yield 'webhooks.remove' => [fn(Client $c) => $c->webhooks->remove('w1'), 'DELETE', '/webhooks/w1', [], null];
+        yield 'webhooks.rotate' => [fn(Client $c) => $c->webhooks->rotateSigningSecret('w1'), 'POST', '/webhooks/w1/signing-secret/rotate', [], null];
         // Suppressions
-        yield 'suppressions.add' => [fn (Client $c) => $c->suppressions->add(['email' => 'x@y.z']), 'POST', '/suppressions', [], ['email' => 'x@y.z']];
-        yield 'suppressions.create' => [fn (Client $c) => $c->suppressions->create(['email' => 'x@y.z']), 'POST', '/suppressions', [], ['email' => 'x@y.z']];
-        yield 'suppressions.list' => [fn (Client $c) => $c->suppressions->list(['origin' => 'bounce']), 'GET', '/suppressions', ['origin' => 'bounce'], null];
-        yield 'suppressions.get' => [fn (Client $c) => $c->suppressions->get('x@y.z'), 'GET', '/suppressions/x@y.z', [], null];
-        yield 'suppressions.remove' => [fn (Client $c) => $c->suppressions->remove('x@y.z'), 'DELETE', '/suppressions/x@y.z', [], null];
-        yield 'suppressions.batch.add' => [fn (Client $c) => $c->suppressions->batch->add(['emails' => ['a@x.y']]), 'POST', '/suppressions/batch/add', [], ['emails' => ['a@x.y']]];
-        yield 'suppressions.batch.remove' => [fn (Client $c) => $c->suppressions->batch->remove(['ids' => ['i1']]), 'POST', '/suppressions/batch/remove', [], ['ids' => ['i1']]];
+        yield 'suppressions.add' => [fn(Client $c) => $c->suppressions->add(['email' => 'x@y.z']), 'POST', '/suppressions', [], ['email' => 'x@y.z']];
+        yield 'suppressions.create' => [fn(Client $c) => $c->suppressions->create(['email' => 'x@y.z']), 'POST', '/suppressions', [], ['email' => 'x@y.z']];
+        yield 'suppressions.list' => [fn(Client $c) => $c->suppressions->list(['origin' => 'bounce']), 'GET', '/suppressions', ['origin' => 'bounce'], null];
+        yield 'suppressions.get' => [fn(Client $c) => $c->suppressions->get('x@y.z'), 'GET', '/suppressions/x@y.z', [], null];
+        yield 'suppressions.remove' => [fn(Client $c) => $c->suppressions->remove('x@y.z'), 'DELETE', '/suppressions/x@y.z', [], null];
+        yield 'suppressions.batch.add' => [fn(Client $c) => $c->suppressions->batch->add(['emails' => ['a@x.y']]), 'POST', '/suppressions/batch/add', [], ['emails' => ['a@x.y']]];
+        yield 'suppressions.batch.remove' => [fn(Client $c) => $c->suppressions->batch->remove(['ids' => ['i1']]), 'POST', '/suppressions/batch/remove', [], ['ids' => ['i1']]];
     }
 
     /**
@@ -219,16 +219,16 @@ final class ResourcesTest extends TestCase
      */
     public static function missing(): iterable
     {
-        yield 'emails.get' => [fn (Client $c) => $c->emails->get('')];
-        yield 'emails.update' => [fn (Client $c) => $c->emails->update(['scheduled_at' => 'x'])];
-        yield 'attachments.list' => [fn (Client $c) => $c->emails->attachments->list([])];
-        yield 'attachments.get' => [fn (Client $c) => $c->emails->attachments->get(['email_id' => 'e'])];
-        yield 'domains.update' => [fn (Client $c) => $c->domains->update(['tls' => 'enforced'])];
-        yield 'contacts.get' => [fn (Client $c) => $c->contacts->get([])];
-        yield 'contacts.get empty' => [fn (Client $c) => $c->contacts->get('')];
-        yield 'contacts.update' => [fn (Client $c) => $c->contacts->update(['first_name' => 'x'])];
-        yield 'contacts.segments.add' => [fn (Client $c) => $c->contacts->segments->add(['email' => 'a@b.c'])];
-        yield 'templates.publish' => [fn (Client $c) => $c->templates->publish('')];
+        yield 'emails.get' => [fn(Client $c) => $c->emails->get('')];
+        yield 'emails.update' => [fn(Client $c) => $c->emails->update(['scheduled_at' => 'x'])];
+        yield 'attachments.list' => [fn(Client $c) => $c->emails->attachments->list([])];
+        yield 'attachments.get' => [fn(Client $c) => $c->emails->attachments->get(['email_id' => 'e'])];
+        yield 'domains.update' => [fn(Client $c) => $c->domains->update(['tls' => 'enforced'])];
+        yield 'contacts.get' => [fn(Client $c) => $c->contacts->get([])];
+        yield 'contacts.get empty' => [fn(Client $c) => $c->contacts->get('')];
+        yield 'contacts.update' => [fn(Client $c) => $c->contacts->update(['first_name' => 'x'])];
+        yield 'contacts.segments.add' => [fn(Client $c) => $c->contacts->segments->add(['email' => 'a@b.c'])];
+        yield 'templates.publish' => [fn(Client $c) => $c->templates->publish('')];
     }
 
     /**

@@ -35,7 +35,8 @@ final class Webhook
     public static function verify(
         string $payload,
         MessageInterface|array $headers,
-        #[\SensitiveParameter] string $secret,
+        #[\SensitiveParameter]
+        string $secret,
         int $tolerance = self::DEFAULT_TOLERANCE,
         ?int $now = null,
     ): WebhookEvent {

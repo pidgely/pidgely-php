@@ -7,6 +7,4 @@ namespace Pidgely\Exception;
 /**
  * 404: the resource does not exist.
  */
-class NotFoundException extends PidgelyException
-{
-}
+class NotFoundException extends PidgelyException {}

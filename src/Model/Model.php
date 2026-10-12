@@ -18,9 +18,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     /**
      * @param array<string, mixed> $attributes the raw API response
      */
-    public function __construct(protected readonly array $attributes = [])
-    {
-    }
+    public function __construct(protected readonly array $attributes = []) {}
 
     /**
      * @return array<string, mixed>

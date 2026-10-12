@@ -7,6 +7,4 @@ namespace Pidgely\Exception;
 /**
  * No API key was given and PIDGELY_API_KEY is not set.
  */
-class MissingApiKeyException extends PidgelyException
-{
-}
+class MissingApiKeyException extends PidgelyException {}
