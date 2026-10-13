@@ -7,6 +7,7 @@ namespace Pidgely\Service;
 use Pidgely\Internal\Transport;
 use Pidgely\Model\Collection;
 use Pidgely\Model\Contact;
+use Pidgely\Model\ContactBatchResult;
 use Pidgely\Model\ContactDeleted;
 use Pidgely\Model\ResourceId;
 
@@ -52,6 +53,18 @@ final class Contacts extends Service
         $path = \is_string($audience) && '' !== $audience ? '/audiences/'.Transport::seg($audience).'/contacts' : '/contacts';
 
         return new ResourceId($this->transport->request('POST', $path, [], self::without($params, 'audience_id'), $options));
+    }
+
+    /**
+     * POST /contacts/batch: creates or updates up to 1,000 contacts by email (['contacts' => [...], 'segment_id' => ...]).
+     * Each row is saved independently; invalid rows are reported in errors with their index.
+     *
+     * @param array<string, mixed> $params
+     * @param RequestOptions       $options
+     */
+    public function batch(array $params, array $options = []): ContactBatchResult
+    {
+        return new ContactBatchResult($this->transport->request('POST', '/contacts/batch', [], $params, $options));
     }
 
     /**

@@ -39,6 +39,7 @@ final class ResourcesTest extends TestCase
         // Contacts
         yield 'contacts.create' => [fn(Client $c) => $c->contacts->create(['email' => 'ana@x.y', 'first_name' => 'Ana', 'segments' => [['id' => 's1']]]), 'POST', '/contacts', [], ['email' => 'ana@x.y', 'first_name' => 'Ana', 'segments' => [['id' => 's1']]]];
         yield 'contacts.create audience' => [fn(Client $c) => $c->contacts->create(['email' => 'ana@x.y', 'audience_id' => 'aud1']), 'POST', '/audiences/aud1/contacts', [], ['email' => 'ana@x.y']];
+        yield 'contacts.batch' => [fn(Client $c) => $c->contacts->batch(['contacts' => [['email' => 'ana@x.y', 'first_name' => 'Ana', 'unsubscribed' => false], ['email' => 'bo@x.y']], 'segment_id' => 's1']), 'POST', '/contacts/batch', [], ['contacts' => [['email' => 'ana@x.y', 'first_name' => 'Ana', 'unsubscribed' => false], ['email' => 'bo@x.y']], 'segment_id' => 's1']];
         yield 'contacts.list' => [fn(Client $c) => $c->contacts->list(['segment_id' => 's1', 'limit' => 100]), 'GET', '/contacts', ['limit' => '100', 'segment_id' => 's1'], null];
         yield 'contacts.list audience' => [fn(Client $c) => $c->contacts->list(['audience_id' => 'a1']), 'GET', '/contacts', ['audience_id' => 'a1'], null];
         yield 'contacts.get string' => [fn(Client $c) => $c->contacts->get('ana+x@x.y'), 'GET', '/contacts/ana+x@x.y', [], null];
@@ -75,6 +76,8 @@ final class ResourcesTest extends TestCase
         yield 'templates.remove' => [fn(Client $c) => $c->templates->remove('welcome'), 'DELETE', '/templates/welcome', [], null];
         yield 'templates.publish' => [fn(Client $c) => $c->templates->publish('welcome'), 'POST', '/templates/welcome/publish', [], null];
         yield 'templates.duplicate' => [fn(Client $c) => $c->templates->duplicate('welcome'), 'POST', '/templates/welcome/duplicate', [], null];
+        yield 'templates.preview' => [fn(Client $c) => $c->templates->preview('welcome', ['variables' => ['NAME' => 'Ana', 'DAYS' => 14]]), 'POST', '/templates/welcome/preview', [], ['variables' => ['NAME' => 'Ana', 'DAYS' => 14]]];
+        yield 'templates.preview no variables' => [fn(Client $c) => $c->templates->preview('wel come'), 'POST', '/templates/wel%20come/preview', [], '{}'];
         // Webhooks
         yield 'webhooks.create' => [fn(Client $c) => $c->webhooks->create(['endpoint' => 'https://acme.com/wh', 'events' => ['email.delivered']]), 'POST', '/webhooks', [], ['endpoint' => 'https://acme.com/wh', 'events' => ['email.delivered']]];
         yield 'webhooks.list' => [fn(Client $c) => $c->webhooks->list(), 'GET', '/webhooks', [], null];
@@ -167,6 +170,8 @@ final class ResourcesTest extends TestCase
             self::json(200, ['object' => 'webhook', 'id' => 'w1', 'signing_secret' => 'whsec_abc']),
             self::json(200, ['data' => [['object' => 'suppression', 'id' => 's', 'deleted' => true]]]),
             self::json(200, ['object' => 'contact', 'id' => 'c', 'email' => 'a@b.c', 'unsubscribed' => false, 'properties' => ['plan' => ['value' => 'pro', 'type' => 'string']]]),
+            self::json(200, ['object' => 'template_preview', 'from' => 'a@acme.com', 'subject' => 'Hi Ana', 'reply_to' => [], 'html' => '<p>Hi Ana</p>', 'text' => 'Hi Ana', 'missing_variables' => ['DAYS']]),
+            self::json(200, ['object' => 'list', 'data' => [['index' => 0, 'id' => 'c1']], 'errors' => [['index' => 1, 'message' => 'email: is invalid']]]),
         ]);
         $email = $client->emails->get('e1');
         self::assertSame(['a@b.c'], $email->to);
@@ -193,6 +198,14 @@ final class ResourcesTest extends TestCase
         self::assertSame('whsec_abc', $client->webhooks->create(['endpoint' => 'https://x', 'events' => ['email.sent']])->signingSecret);
         self::assertTrue($client->suppressions->batch->remove(['emails' => ['a@b.c']])->data[0]->deleted);
         self::assertSame(['plan' => ['value' => 'pro', 'type' => 'string']], $client->contacts->get('c')->properties);
+        $preview = $client->templates->preview('welcome', ['variables' => ['NAME' => 'Ana']]);
+        self::assertSame('Hi Ana', $preview->subject);
+        self::assertSame('<p>Hi Ana</p>', $preview->html);
+        self::assertSame(['DAYS'], $preview->missingVariables);
+        $batch = $client->contacts->batch(['contacts' => [['email' => 'a@b.c'], ['email' => 'bad']]]);
+        self::assertSame('c1', $batch->data[0]->id);
+        self::assertSame(0, $batch->data[0]->index);
+        self::assertSame([['index' => 1, 'message' => 'email: is invalid']], $batch->errors);
     }
 
     public function testModelsAreReadOnly(): void
@@ -224,6 +237,7 @@ final class ResourcesTest extends TestCase
         yield 'contacts.update' => [fn(Client $c) => $c->contacts->update(['first_name' => 'x'])];
         yield 'contacts.segments.add' => [fn(Client $c) => $c->contacts->segments->add(['email' => 'a@b.c'])];
         yield 'templates.publish' => [fn(Client $c) => $c->templates->publish('')];
+        yield 'templates.preview' => [fn(Client $c) => $c->templates->preview('')];
     }
 
     /**

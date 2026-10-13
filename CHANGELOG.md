@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `templates->preview($idOrAlias, ['variables' => [...]])` renders a template draft with variables (`POST /templates/{id_or_alias}/preview`) and returns a `TemplatePreview`.
+- `contacts->batch(['contacts' => [...], 'segment_id' => ...])` creates or updates up to 1,000 contacts in one request (`POST /contacts/batch`) and returns a `ContactBatchResult` (`data` as `ContactBatchItem`s); invalid rows are reported in `errors` with their index.
+
 ## [0.1.0] - 2026-10-12
 
 ### Added

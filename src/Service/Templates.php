@@ -9,6 +9,7 @@ use Pidgely\Model\Collection;
 use Pidgely\Model\Deleted;
 use Pidgely\Model\ResourceId;
 use Pidgely\Model\Template;
+use Pidgely\Model\TemplatePreview;
 
 /**
  * Templates, addressed by id or alias.
@@ -80,6 +81,17 @@ final class Templates extends Service
     public function publish(string $idOrAlias, array $options = []): ResourceId
     {
         return new ResourceId($this->transport->request('POST', '/templates/'.self::id($idOrAlias).'/publish', [], null, $options));
+    }
+
+    /**
+     * POST /templates/{id_or_alias}/preview: renders the draft with ['variables' => [...]] without sending anything.
+     *
+     * @param array<string, mixed> $params
+     * @param RequestOptions       $options
+     */
+    public function preview(string $idOrAlias, array $params = [], array $options = []): TemplatePreview
+    {
+        return new TemplatePreview($this->transport->request('POST', '/templates/'.self::id($idOrAlias).'/preview', [], (object) $params, $options));
     }
 
     /**

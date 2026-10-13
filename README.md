@@ -218,6 +218,16 @@ $pidgely->contacts->get(['email' => 'ana@example.com']); // or get('ana@example.
 $pidgely->contacts->update(['email' => 'ana@example.com', 'unsubscribed' => true]); // kept in sync with the suppression list
 $pidgely->contacts->remove(['email' => 'ana@example.com']);
 
+// Upsert up to 1,000 contacts; invalid rows are reported with their index instead of failing the request
+$result = $pidgely->contacts->batch([
+    'contacts' => [
+        ['email' => 'ana@example.com', 'first_name' => 'Ana'],
+        ['email' => 'bruno@example.com', 'properties' => ['plan' => 'team']],
+    ],
+    'segment_id' => $segmentId, // optional: added to every row
+]);
+// $result->data → [{index, id}], $result->errors → [['index' => ..., 'message' => ...]]
+
 $pidgely->contacts->segments->list(['email' => 'ana@example.com']);
 $pidgely->contacts->segments->add(['email' => 'ana@example.com', 'segment_id' => $segmentId]);
 $pidgely->contacts->segments->remove(['contact_id' => $contactId, 'segment_id' => $segmentId]);
@@ -273,6 +283,9 @@ $template = $pidgely->templates->create([
     ],
 ]);
 $pidgely->templates->publish($template->id); // the published version is what `template` sends
+
+// Render the draft without sending; missingVariables lists variables with no value and no fallback
+$preview = $pidgely->templates->preview('welcome', ['variables' => ['NAME' => 'Ana', 'TRIAL_DAYS' => 30]]);
 
 $pidgely->templates->get('welcome'); // by id or alias (draft)
 $pidgely->templates->update('welcome', ['subject' => 'Welcome aboard, {{{NAME}}}!']);
@@ -383,7 +396,7 @@ Pidgely serves the Resend REST API at the same paths, and this SDK mirrors `rese
 3. Verify your domain in Pidgely and publish the DNS records it returns.
 4. If you verify webhooks, use `Pidgely\Webhook::verify()` with the `whsec_…` secret from your Pidgely webhook.
 
-Parameter arrays use the same snake_case keys and the services keep their names (`emails`, `batch`, `domains`, `apiKeys`, `contacts`, `segments`/`audiences`, `broadcasts`, `templates`, `webhooks`). Responses are typed objects (`$email->id`); array access with the API's keys also works. Exceptions are `Pidgely\Exception\*`. Pidgely additions include `emails->attachments`, `apiKeys->update`, `segments->update/listContacts`, `broadcasts->cancel/duplicate`, `suppressions`, the `stream` field on emails and built-in retries. Some Resend features are not supported yet: open/click tracking, topics, inbound email, automations, events and logs. See the migration guide at [docs.pidgely.com](https://docs.pidgely.com) for the full list.
+Parameter arrays use the same snake_case keys and the services keep their names (`emails`, `batch`, `domains`, `apiKeys`, `contacts`, `segments`/`audiences`, `broadcasts`, `templates`, `webhooks`). Responses are typed objects (`$email->id`); array access with the API's keys also works. Exceptions are `Pidgely\Exception\*`. Pidgely additions include `emails->attachments`, `apiKeys->update`, `segments->update/listContacts`, `contacts->batch`, `templates->preview`, `broadcasts->cancel/duplicate`, `suppressions`, the `stream` field on emails and built-in retries. Some Resend features are not supported yet: open/click tracking, topics, inbound email, automations, events and logs. See the migration guide at [docs.pidgely.com](https://docs.pidgely.com) for the full list.
 
 ## Development
 
